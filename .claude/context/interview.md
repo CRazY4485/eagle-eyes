@@ -216,7 +216,7 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Recorded:** 2026-09-25
 **Nəticə:** sənəd `docs/superpowers/specs/` altında Markdown, git ilə. Yazmazdan əvvəl qaralama + qərarlar sistemli yoxlanılır; Q15/Q17 təsdiqi hələ açıqdır (Q25-də).
 
-## Q34 [open] API varsa, panel ilə anbarın fərqli provayderlərdə olmasına təhlükəsizlik baxımından hələ ehtiyac varmı?
+## Q34 [answered] API varsa, panel ilə anbarın fərqli provayderlərdə olmasına təhlükəsizlik baxımından hələ ehtiyac varmı?
 **Asked (istifadəçi, 2026-09-25):** "Əgər API istifadə ediriksə, panel ilə bazanın təhlükəsizlik baxımından fərqli provayderlərdə saxlanmasına hələ də ehtiyac varmı."
 **İzah verildi:** ayrılıq API-dən sonra yalnız dəlil qeydlərini/arxivi bir hesabın ələ keçirilməsindən qoruyur. Seçimlər: 1 ayrılıq qalsın (tövsiyə) / 2 hamısı Cloudflare-da.
 **Cavab 1:** "Təhlükəsizlik dedikdə, dəlil qeydlərinin ələ keçirilməsi aspektindən baxmaq lazım deyil. Əsas təhlükə ticarət hesabında rast gələ şəkildə (random) ticarətlərin açılması və maddi zərər verilməsidir" (2026-09-25)
@@ -231,13 +231,17 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Cavab 4 (T-2):** "Ən sadə üsul olaraq, hər konfiqurasiya və simvol xəritələməsi üçün bildiriş göndərilməsidir. Digər mövzu olaraq API təhlükəsizliyi üçün alınacaq tədbirlər barədə müzakirə edək." (2026-09-25)
 **Qərar:** T-2 qəbul — hər konfiqurasiya və simvol xəritələməsi dəyişikliyində bildiriş. T-1 və anbar sualı hələ cavabsızdır (açıq). API təhlükəsizliyi tədbirləri → Q35.
 **T-1 (Q35-də):** "Xeyr, T-2 kifayətdir" — T-1 qəbul edilmir. Açıq qalan: yalnız anbar (A hamısı Cloudflare / B AWS əsas + config versiyası).
+**Anbar cavabı:** "Anbar AWS olaraq qalsın + konfiqurasiyalar versiyalanmasın, gərək yoxdur" (2026-09-25)
+**Qərar:** Q10 qüvvədə qalır (AWS əsas, R2 ehtiyat); `config` bucket-ında versiya yoxdur (ANB-01 dəyişmir). Q10-un təhlükəsizlik əsası dəyişib: yeni təhlükə modelində ayrılıq əsas qoruma deyil; qərar operatorun üstünlüyüdür. Q34 answered.
 
-## Q35 [open] API təhlükəsizliyi üçün hansı tədbirlər alınır?
+## Q35 [answered] API təhlükəsizliyi üçün hansı tədbirlər alınır?
 **Asked (istifadəçi, 2026-09-25):** "Digər mövzu olaraq API təhlükəsizliyi üçün alınacaq tədbirlər barədə müzakirə edək."
 **Təklif:** A1 Access yalnız operator, MFA (biometrika), qısa sessiya (8 saat); A2 JWT tam yoxlama; A3 default-deny marşrutlar; A4 EA tokeni uzun, sabit vaxtlı müqayisə, demo/real ayrı; B1 sirlər yalnız platforma sirlər anbarında; B2 deploy token dar icazəli, repoda yox; C1 minimum asılılıq, sabit versiyalar; C2 sorğu formatı/ölçüsü yoxlanılır; D1 GitHub 2FA, main qorunur, avtomatik deploy yox; D2 push protection; E1 registrar 2FA + kilid; E2 CAA; E3 sorğu tezliyi həddi; F1 T-2 EA-dan; F2 uğursuz girişlər → vəziyyət → təcili push. G1 K-2; G2 T-1.
 **Cavab 1 (A–F):** "Github reposu layihə sənədi təsdiqləndikdən sonra `private` olaraq dəyişdiriləcək, buna görə github tədbirləri lazım deyil." (2026-09-25)
 **Cavab 2 (T-1):** "Xeyr, T-2 kifayətdir" (2026-09-25)
 **Qərar:** D1 və D2 (GitHub tədbirləri) çıxarılır. T-1 (EA təhlükəsizlik tavanları) qəbul edilmir; PNL-11 olduğu kimi qalır. A, B, C, E, F barədə açıq cavab yoxdur — təsdiqlənməlidir. Anbar sualı (Q34) hələ açıqdır.
+**Sual 2:** GitHub-dan kənar tədbirlər (A1–A4, B1–B2 — əl ilə yerləşdirmə B2-yə daxil, C1–C2, E1–E3, F1–F2) → **Answer:** "Bəli, haması" (2026-09-25)
+**Status:** Q35 answered.
 
 ## Q36 [deferred: layihə sənədinin təsdiqi] GitHub reposu private edilir
 **Mənbə:** Q35 cavab 1 (2026-09-25): "Github reposu layihə sənədi təsdiqləndikdən sonra `private` olaraq dəyişdiriləcək"

@@ -1273,11 +1273,13 @@ Dəyər həmişə `≈` işarəsi və hesablama anı ilə göstərilir. Vəziyy�
 | Nüsxəsiz bərpa: BE/TS aktiv deyil | LOK-07 |
 | Konfiqurasiya lokal nüsxədən götürüldü və ya ümumiyyətlə yoxdur | LOK-11 |
 | Real hesabda sınaq cədvəli aşkarlandı | TQV-15 |
+| Konfiqurasiya və ya simvol xəritələməsi dəyişdi | THL-17 |
+| API uğursuz giriş cəhdləri və ya rədd edilmiş sorğular qeydə aldı | THL-18 |
 
 **BLD-03. Xülasə — dövri, birləşmiş mesaj.** Tez-tez baş verən, sayıla bilən hadisələr: açılan və bağlanan əməliyyatların sayı, buraxılan planların sayı, təqvim oxunuşunun nəticəsi, tək mənbə nasazlığı, nasazlıq halları (İDR-12).
 Əsas: bir xəbər anında bir neçə simvolda eyni anda əməliyyat açıla bilər. Hər biri ayrıca mesaj olsaydı, dəqiqəlik büdcə saniyələrdə dolardı.
 
-**BLD-04. Yalnız qeyd — bildiriş göndərilmir.** Qalan hər şey: plan quruldu, hər broker cavabı, sapma, konfiqurasiya dəyişiklikləri.
+**BLD-04. Yalnız qeyd — bildiriş göndərilmir.** Qalan hər şey: plan quruldu, hər broker cavabı, sapma. Konfiqurasiya dəyişiklikləri həm qeydə alınır, həm də təcili bildirişlə göndərilir (THL-17).
 
 **BLD-05. Büdcə heç vaxt aşılmır.** Hadisə büdcəni aşacaqsa, növbəti xülasəyə keçir.
 
@@ -1317,23 +1319,69 @@ Həftəsonu xülasəsi qısadır: "Bazar bağlı idi. Sistem işləyir."
 
 # 16. Təhlükəsizlik
 
-**THL-01. EA tokeni** yalnız EA parametrlərində saxlanılır və yalnız EA sorğularına icazə verir. Sızarsa, API-də dərhal ləğv edilir. Yeni token masaüstü sinxronizasiya ilə VPS-ə çatdırılır, EA bu müddətdə lokal nüsxələrlə işləyir.
+## 16.1 Təhlükə modeli
 
-**THL-02. Panel yalnız Cloudflare Access arxasında açılır.** Giriş siyahısında yalnız operatorun kimliyi olur. Müstəqil MFA məcburidir: TOTP, təhlükəsizlik açarı və ya biometrika.
-Əsas: cihaz oğurlansa belə sessiya bitir, yeni giriş parol və ikinci addım tələb edir.
+**Əsas təhlükə: ticarət hesabında icazəsiz və ya təsadüfi ticarətlərin açılması və maddi zərər.** Dəlil qeydlərinin ələ keçirilməsi əsas təhlükə sayılmır.
 
-**THL-03. Anbar açarları yalnız API qatının sirlər anbarındadır.** Brauzerə, VPS-ə, koda və git-ə heç vaxt düşmür.
+Hücumçu sistemi zərərli ticarətə iki yolla məcbur edə bilər:
+- **broker hesabına birbaşa giriş** (parol, operatorun kompüteri). Bu yol sistemdən kənardır və broker hesabının öz qoruması ilə bağlanır (THL-04);
+- **konfiqurasiyanın saxtalaşdırılması**, yəni EA-ya saxta ticarət parametrləri çatdırmaq. Buna aparan yollar: Cloudflare hesabı, yerləşdirmə tokeni, API-dəki proqram səhvi, Access-in səhv qurulması, açıq panel sessiyası olan cihaz, domen, AWS hesabı və ya açarı.
 
-**THL-04. Bütün hesablarda iki addımlı giriş (2FA) yandırılır:** Cloudflare, AWS, MQL5.community, broker kabineti, domen qeydiyyatçısı, git deposu.
-Əsas: Cloudflare hesabı sistemin iki komponentini (API, panel) saxlayır. Onun qorunması ən vacib tək addımdır.
+Sistem konfiqurasiyanın saxtalaşdırılmasının **qarşısını** hesab və giriş qorumaları ilə alır, onu **aşkarlamağı** isə EA-dan gələn bildirişlə təmin edir (THL-17). EA parametrlərində ayrıca təhlükəsizlik tavanları **qurulmur**: operatorun qərarıdır, bildiriş kifayət sayılır.
 
-**THL-05. Sirlər heç vaxt koda, git-ə, qeydlərə və ya mesajlara yazılmır.**
+## 16.2 Hesablar və sirlər
+
+**THL-01. EA tokeni** yalnız EA parametrlərində saxlanılır və yalnız EA sorğularına icazə verir. Uzun və təsadüfidir, API onu sabit vaxtlı müqayisə ilə yoxlayır. Demo və real hesab üçün ayrı tokenlər olur. Sızarsa, API-də dərhal ləğv edilir. Yeni token masaüstü sinxronizasiya ilə VPS-ə çatdırılır, EA bu müddətdə lokal nüsxələrlə işləyir.
+Əsas: sabit vaxtlı müqayisə cavab vaxtına baxaraq tokeni təxmin etməyin qarşısını alır.
+
+**THL-02. Panel yalnız Cloudflare Access arxasında açılır.** Giriş siyahısında yalnız operatorun e-poçtu olur. Müstəqil MFA məcburidir, üstünlük telefonun biometrikasına (Face ID, barmaq izi) verilir. Sessiya müddəti 8 saatdır.
+Əsas: cihaz oğurlansa belə sessiya tez bitir, yeni giriş parol və ikinci addım tələb edir. *8 saat ixtiyari seçimdir: bir iş gününü əhatə edir.*
+
+**THL-03. Bütün sirlər (anbar açarı, EA tokeni, arxiv işinin tokeni) yalnız API platformasının sirlər anbarındadır**, EA tokeni isə həm də EA parametrlərində. Brauzerə heç biri düşmür.
+
+**THL-04. Bütün hesablarda iki addımlı giriş (2FA) yandırılır:** Cloudflare, AWS, MQL5.community, broker kabineti, domen qeydiyyatçısı.
+Əsas: bu hesabların hər biri konfiqurasiyaya və ya ticarət hesabına aparan yoldur.
+
+**THL-05. Sirlər heç vaxt koda, konfiqurasiya fayllarına, git-ə, qeydlərə və ya mesajlara yazılmır.**
+
+**THL-09. Kodu Cloudflare-a yükləyən token yalnız bu Worker üçün icazəlidir və repoda saxlanılmır. Kod API-yə yalnız əl ilə yüklənir, avtomatik yerləşdirmə yoxdur.**
+Əsas: avtomatik yerləşdirmə olsaydı, kod deposuna girişi olan hər kəs API-ni dəyişə bilərdi.
+
+## 16.3 API-nin kodu
+
+**THL-10. Standart olaraq hər şey qadağandır.** API-də hər sorğu kimin çağıra biləcəyini (EA, panel, arxiv işi) açıq yazır. Yazmayan sorğu işləmir.
+
+**THL-11. Panel sorğusunda imzalı token standart kitabxana ilə tam yoxlanılır:** imza, göndərən, alıcı, bitmə vaxtı (API-05). Yoxlamadan keçməyən sorğu rədd edilir.
+
+**THL-12. Hər sorğunun formatı və ölçüsü yoxlanılır.** Ölçü həddini aşan və ya formatı düzgün olmayan sorğu rədd edilir. Konfiqurasiya əlavə olaraq 18.2-dəki aralıqlarla yoxlanılır (API-06).
+
+**THL-13. Minimum sayda xarici kitabxana işlədilir, versiyaları sabitlənir, yeniləmədən əvvəl yoxlanılır.**
+Əsas: sındırılmış kitabxana sirləri oğurlaya və ya davranışı dəyişə bilər.
+
+## 16.4 Domen və şəbəkə
+
+**THL-14. Domen qeydiyyatçısında 2FA və domen kilidi (registrar lock) yandırılır.**
+Əsas: domen ələ keçirilsə, `api.<domen>` hücumçunun serverinə yönəldilə bilər. Onda EA tokenini ona göndərər və ondan saxta konfiqurasiya alardı. Bu yol API-yə və anbara toxunmadan işləyir.
+
+**THL-15. DNS-də CAA qeydi ilə domenə yalnız seçilmiş sertifikat verəni sertifikat verə bilir.**
+
+**THL-16. `api.<domen>` üçün sorğu tezliyinə hədd qoyulur.** EA-nın normal tezliyi məlumdur (18.1), ondan çox sorğu rədd edilir.
+
+**THL-08. Panelin ünvanını tapan şəxs Access-dən keçmədən heç nə görmür və heç nə yaza bilmir.**
+
+## 16.5 Aşkarlama
 
 **THL-06. Hər konfiqurasiya dəyişikliyi kimin tərəfindən və nə vaxt edildiyi ilə qeydə alınır** (API-06).
 
-**THL-07. Riskin bölünməsi:** API və panel Cloudflare-da, məlumat AWS-dədir. Bir hesabın sındırılması hər şeyi aparmır. Hər iki halda ticarət API-dən asılı deyil (NSZ-09), fövqəladə dayandırma isə MetaTrader-dədir (3.6).
+**THL-17. Hər konfiqurasiya və simvol xəritələməsi dəyişikliyində təcili bildiriş gedir.** Bildirişi **Rabitə EA** göndərir: API-dən oxuduğu yeni konfiqurasiyanı lokal nüsxə ilə müqayisə edir və fərqi mesaja yazır. Bir oxunuşdakı bütün dəyişikliklər bir mesajda birləşir, məsələn: "Konfiqurasiya dəyişdi: EURUSD/High Lot 0.10→5.00, +XAUUSD (14:05:12)". 255 simvola sığmayan fərq qısaldılır, tam siyahı dəlil qeydinə yazılır.
+Əsas: bildiriş API-dən göndərilsəydi, API-ni ələ keçirən şəxs onu söndürə bilərdi. EA-nın müqayisəsini isə VPS-ə girişi olmayan heç kim söndürə bilmir. Dəyişiklikləri birləşdirmək bir neçə sahənin birdən redaktəsində bildiriş büdcəsinin aşılmasının qarşısını alır.
 
-**THL-08. Panelin ünvanını tapan şəxs Access-dən keçmədən heç nə görmür və heç nə yaza bilmir.**
+**THL-18. API uğursuz giriş cəhdlərini və rədd edilmiş sorğuları vəziyyətə yazır. Rabitə EA onları təcili bildiriş kimi göndərir** (epizod başına bir dəfə).
+Əsas: API-nin telefona öz kanalı yoxdur. Mövcud kanal işlədilir.
+
+## 16.6 Anbar provayderi
+
+**THL-07. API və panel Cloudflare-da, məlumat AWS-dədir.** Bu ayrılıq əsas təhlükəyə (16.1) qarşı əlavə qoruma vermir: API anbar açarını özündə saxladığı üçün hər iki hesabdan biri konfiqurasiyaya yol açır. Ayrılığın verdiyi odur ki, bir provayder çökəndə və ya bir hesab sındırılanda məlumat, xüsusən arxiv, digər tərəfdə qorunur. AWS əsas provayderdir, çünki operator ona üstünlük verir. `config` bucket-ında versiya açılmır.
 
 ---
 
@@ -1583,6 +1631,7 @@ Mərhələ 2-dən əvvəl MetaTrader VPS abunəliyi alınır.
 | Hər iki əmr işə düşür | İkiqat mövqe (hedging) və ya bağlanma/çevrilmə (netting) | İDR-12. Kifayət qədər böyük offset (HZR-02 qeydi) |
 | Cloudflare hesabı sındırılır | API və panel təhlükəyə düşür | 2FA (THL-04), məlumat ayrı provayderdə (THL-07), ticarət API-dən asılı deyil |
 | EA tokeni sızır | Kənar şəxs EA adından yaza bilər | API-də dərhal ləğv (THL-01) |
+| Konfiqurasiya saxtalaşdırılır (Cloudflare, domen, AWS, API səhvi, açıq sessiya) | EA saxta parametrlərlə ticarət edir, maddi zərər | Qarşısını alma: THL-01…THL-16. Aşkarlama: hər dəyişiklikdə EA-dan təcili bildiriş (THL-17), operator MetaTrader-dən müdaxilə edir (3.6). Aşkarlanana qədər, ən az bir oxunuş intervalı (30 s), saxta parametrlər işləyə bilər |
 | Lokal konfiqurasiya nüsxəsi köhnədir | Yenidən başlamadan sonra köhnə qayda işləyir | Təcili bildiriş (LOK-11 K-3). Fövqəladə dayandırma MetaTrader-dədir |
 
 ---
@@ -1642,7 +1691,8 @@ Bu sənəd qaralamadan fərqlənən hər qərarı müsahibə jurnalına (`.claud
 
 | Qaydalar | Jurnal |
 |---|---|
-| ARX-09…ARX-12, 3.4, 3.5, API-01…API-05, THL | Q21, Q14 |
+| ARX-09…ARX-12, 3.4, 3.5, API-01…API-05 | Q21, Q14 |
+| THL bölməsi (təhlükə modeli, THL-09…THL-18), BLD-02 əlavələri | Q34, Q35 |
 | ARX-06, 3.2 | Q15 |
 | ARX-04, NSZ-14 | Q05 |
 | ANB bölməsi, API-09, QYD-05 | Q10, Q22 (ANB-03a: sənəd yoxlaması, 2026-09-25) |
