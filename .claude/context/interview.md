@@ -223,6 +223,24 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Mənim oxunuşum:** təhlükə modeli = hesabda icazəsiz/təsadüfi ticarətlə maddi zərər. Q10-dakı AWS seçiminin təhlükəsizlik əsası bu modeldə keçərli deyil → reconciliation; əsas qorunmalı olan konfiqurasiyanın (ticarət parametrlərinin) saxtalaşdırılmasıdır.
 **Təklif (2026-09-25):** T-1 EA parametrlərində təhlükəsizlik tavanları (ən böyük lot, ən böyük Risk %, məcburi zərər limitləri, icazəli simvollar; aşan konfiqurasiya rədd + təcili bildiriş; PNL-11 dəyişir); T-2 hər konfiqurasiya dəyişikliyində təcili bildiriş; anbar: A hamısı Cloudflare (R2) — tövsiyə / B AWS əsas qalır.
 **Cavab 2:** üç sualın üçünə də "[No preference]" (2026-09-25) — qərar verilməyib, açıq qalır.
+**Sual (istifadəçi, 2026-09-25):** "AWS-in geniş imkanlarından qalxan yaratmaq mümkündür mü? Məsələn; İAM, KMS və s."
+**İzah verildi:** AWS aşkarlama/geri qaytarma verir (versiya, CloudTrail), qarşısını almır; qarşısını alan yalnız EA-dakı T-1. T-1/T-2/anbar yenidən soruşuldu.
+**Cavab 3:** üçünə də yenə "[No preference]" (2026-09-25).
+**Sual (istifadəçi, 2026-09-25):** "API S3 ilə tərtib edilirsə, AWS hesabının oğurlanması xaricində API-ni başqa cür necə əldə edə bilərlər?"
+**İzah verildi:** API Cloudflare Workers-dədir; 10 hücum yolu (Cloudflare hesabı, deploy token, GitHub, asılılıq, domen, API səhvi, Access səhvi, açıq sessiya, operatorun kompüteri, AWS); hamısını örtən T-1.
+**Cavab 4 (T-2):** "Ən sadə üsul olaraq, hər konfiqurasiya və simvol xəritələməsi üçün bildiriş göndərilməsidir. Digər mövzu olaraq API təhlükəsizliyi üçün alınacaq tədbirlər barədə müzakirə edək." (2026-09-25)
+**Qərar:** T-2 qəbul — hər konfiqurasiya və simvol xəritələməsi dəyişikliyində bildiriş. T-1 və anbar sualı hələ cavabsızdır (açıq). API təhlükəsizliyi tədbirləri → Q35.
+**T-1 (Q35-də):** "Xeyr, T-2 kifayətdir" — T-1 qəbul edilmir. Açıq qalan: yalnız anbar (A hamısı Cloudflare / B AWS əsas + config versiyası).
+
+## Q35 [open] API təhlükəsizliyi üçün hansı tədbirlər alınır?
+**Asked (istifadəçi, 2026-09-25):** "Digər mövzu olaraq API təhlükəsizliyi üçün alınacaq tədbirlər barədə müzakirə edək."
+**Təklif:** A1 Access yalnız operator, MFA (biometrika), qısa sessiya (8 saat); A2 JWT tam yoxlama; A3 default-deny marşrutlar; A4 EA tokeni uzun, sabit vaxtlı müqayisə, demo/real ayrı; B1 sirlər yalnız platforma sirlər anbarında; B2 deploy token dar icazəli, repoda yox; C1 minimum asılılıq, sabit versiyalar; C2 sorğu formatı/ölçüsü yoxlanılır; D1 GitHub 2FA, main qorunur, avtomatik deploy yox; D2 push protection; E1 registrar 2FA + kilid; E2 CAA; E3 sorğu tezliyi həddi; F1 T-2 EA-dan; F2 uğursuz girişlər → vəziyyət → təcili push. G1 K-2; G2 T-1.
+**Cavab 1 (A–F):** "Github reposu layihə sənədi təsdiqləndikdən sonra `private` olaraq dəyişdiriləcək, buna görə github tədbirləri lazım deyil." (2026-09-25)
+**Cavab 2 (T-1):** "Xeyr, T-2 kifayətdir" (2026-09-25)
+**Qərar:** D1 və D2 (GitHub tədbirləri) çıxarılır. T-1 (EA təhlükəsizlik tavanları) qəbul edilmir; PNL-11 olduğu kimi qalır. A, B, C, E, F barədə açıq cavab yoxdur — təsdiqlənməlidir. Anbar sualı (Q34) hələ açıqdır.
+
+## Q36 [deferred: layihə sənədinin təsdiqi] GitHub reposu private edilir
+**Mənbə:** Q35 cavab 1 (2026-09-25): "Github reposu layihə sənədi təsdiqləndikdən sonra `private` olaraq dəyişdiriləcək"
 
 ## Q29 [deferred: Mərhələ 1 (MRH-01) — VPS sınaq proqramının nəticəsi] MT5 təqvimi VPS-də əlçatandırmı, Forex Factory VPS-in ünvanından çəkilə bilirmi?
 **Mənbə:** qaralama 20.1; spec MRH-01, 21.1. Cavab "xeyr" olarsa təqvim dizaynı dəyişir.
