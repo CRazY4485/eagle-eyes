@@ -1163,7 +1163,9 @@ API-də panel üçün **heç bir ticarət hərəkəti** və heç bir silmə sor�
 - Canlı toplu: `İİİİ/AA/GG/<UTC vaxt>-<növbə>.json`
 - Arxiv: `İİİİ-Hhh.jsonl.gz` (server vaxtı ilə ISO həftə nömrəsi) və yanında yoxlama cəmi
 
-**ANB-07. API qatının anbar açarı minimum icazəlidir:**
+**ANB-07. Anbara giriş üçün bir açar var. O, beş bucket-ın hamısına aiddir, yalnız API qatının sirlər anbarında saxlanılır və hər bucket üçün fərqli, minimum icazəlidir.** EA və operator bu açarı görmür və işlətmir. EA API-yə öz tokeni ilə (API-04), operator Access girişi ilə (API-05) müraciət edir. API sorğunu yoxlayır və anbara **onların adından** yazır. Məsələn, operator paneldə Stop Loss-u dəyişəndə: Access girişi → API kimliyi və aralığı yoxlayır (API-06) → API açarla yalnız `config`-ə yazır → dəyişiklik kim və nə vaxt ilə qeydə alınır (THL-06).
+
+Açarın icazələri:
 
 | Bucket | İcazə |
 |---|---|
@@ -1172,7 +1174,7 @@ API-də panel üçün **heç bir ticarət hərəkəti** və heç bir silmə sor�
 | `evidence-archive` | Oxu, yaz, siyahıla. **Silmə yoxdur** |
 
 Açarın bucket yaratmaq, qoruma, versiya və ya lifecycle dəyişmək, versiya nömrəsi ilə silmək icazəsi yoxdur.
-Əsas: API sındırılsa belə, açarla arxiv silinə və qoruma söndürülə bilməz. EA və panelin icazə fərqləri API-nin öz marşrutlarında tətbiq olunur (API-02, API-03).
+Əsas: API sındırılsa belə, açarla arxiv silinə və qoruma söndürülə bilməz. Operatorun cihazı oğurlansa, anbar açarı oğurlanmır, çünki orada yoxdur. EA və panelin nəyə icazəsi olduğunu anbar açarı yox, API-nin öz sorğuları təyin edir (API-02, API-03). Məsələn, EA konfiqurasiyanı dəyişə bilməz, panel isə qeydləri silə bilməz, çünki API-də belə sorğular yoxdur. İkinci anbar açarı (EA və panel sorğuları üçün ayrı) əlavə qoruma verməzdi, çünki ikisi də eyni sirlər anbarında olardı.
 
 **ANB-08. Panel üçün qeydlər bir cavabda verilir:** cari və keçən həftə canlı bucket-dan, köhnə həftələr arxivdən. İstifadəçi fərqi görmür.
 

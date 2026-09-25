@@ -210,6 +210,16 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Recorded:** 2026-09-25
 **Nəticə:** sənəd `docs/superpowers/specs/` altında Markdown, git ilə. Yazmazdan əvvəl qaralama + qərarlar sistemli yoxlanılır; Q15/Q17 təsdiqi hələ açıqdır (Q25-də).
 
+## Q27 [answered] Sənəddə açıq təsdiq tələb edən dörd nəticə (review-dan sonra)
+**Asked (2026-09-25):** 1 TQV-10 Paused-da planlar qurulur; 2 NSZ-09 API əlçatmazlığı təcili bildiriş; 3 ANB-07 API-nin bir minimum icazəli anbar açarı; 4 17.2 provayder meyarları saxlanılır.
+**Answer:** "Layihə sənədini ümumiyyətlə oxumamışam, review tələbimin məqsədi düzgün yazılmış layihə sənədini oxumaq idi. 1. Bəli 2. Bəli 3. Dəlil qeydləri üçün yaradılmış anbar açarı 1 dənədir? Anbarda sadəcə dəlil qeydlərinin saxlamağımız qərarını aldığımızı xatırlamıram. Bucket-ları ayırdığımızı bilirəm. Bu məsələni tam anlamadım. 4. Bəli"
+**Recorded:** 2026-09-25
+**Nəticə:** 1, 2, 4 qəbul. 3 aydınlaşdırılmalıdır (ANB-07 bütün 5 bucket-a aid bir açardır, yalnız qeydlərə deyil).
+**İzah verildi:** 5 bucket, açar yalnız API-də, bucket üzrə icazələr, EA/panel icazələri API qaydalarındadır; iki açarın faydası yoxdur.
+**Cavab 2:** "5 bucket və 1 açar var, açarın hər bucket üçün icazəsi fərqlidir olaraq başa düşdüm, doğrudur? Operatorun (trader-in) paneldən etdiyi dəyişikliklər üçün həmin açar istifadə ediləcək?" (2026-09-25)
+**İzah 2:** bəli; açarı operator yox, API işlədir: Access girişi → API yoxlayır → API açarla yalnız config-ə yazır → audit qeydi. EA da açarı görmür.
+**Cavab 3:** "Bəli, qəbul" — ANB-07 izahla yenilənir. (2026-09-25)
+
 ## Q25 [answered] Sistemli yoxlama: qalan boşluqlar, ziddiyətlər, qarışıqlıqlar
 **Tapıntılar (2026-09-25):**
 - B1: son vəziyyətli plan + açıq mövqe (5.5, 5.5.3, 10.3) və Q-3 nüsxənin silinməsi ziddiyəti
