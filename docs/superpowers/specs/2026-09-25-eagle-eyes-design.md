@@ -113,7 +113,7 @@ Bu bölmə bütöv zənciri bir yerdə göstərir. Qalan bölmələr bu zənciri
  │ Qrafik 1 │ TİCARƏT EA                                        │
  │          │ hazırlıq, yoxlamalar, əmrlər, SL/TP/BE/TS,        │
  │          │ zərər limiti, blackout, rejim, uzlaşdırma         │
- │          │ ⛔ WebRequest işlətmir (yeganə istisna: ARX-04)    │
+ │          │ ⛔ WebRequest işlətmir, push yalnız ARX-04 halında │
  │                     ▲ │  qlobal dəyişənlər + lokal fayllar   │
  │                     │ ▼                                      │
  │ Qrafik 2 │ RABİTƏ EA                                         │
@@ -378,7 +378,7 @@ Bir simvol və bir xəbər anı üçün qurulmuş, icra vaxtı və parametrləri
 | **İcra olunmuş** | Plan üzrə açıq əməliyyat yarandıqda | Ticarət EA |
 | **Tamamlanmış** ⏹ | İcra olunmuş plan üzrə brokerdə mövqe qalmadıqda | Ticarət EA |
 | **Vaxtı bitmiş** ⏹ | Gözləyən əmrlər mövqe yaratmadan silindikdə | Ticarət EA |
-| **Buraxılmış** ⏹ | Yoxlama keçmədiyinə və ya nasazlığa görə plan icra olunmadıqda | İkisi də |
+| **Buraxılmış** ⏹ | Yoxlama keçmədiyinə və ya nasazlığa görə plan icra olunmadıqda | Ticarət EA |
 | **Ləğv edilmiş** ⏹ | Qurulmuş plan icradan çıxarıldıqda: xəbər təqvimdən çıxdı, konfiqurasiya silindi, başqa planla birləşdi | Rabitə EA |
 | **Dayandırılmış** ⏹ | Ticarət rejimi, zərər limiti və ya quraşdırma kilidi səbəbindən | Ticarət EA |
 
@@ -403,11 +403,12 @@ Nümunə, qayda olmasaydı:
 ```
 Qayda ilə hər **simvol × xəbər anı** cütü üçün **bir nəticə** olur. Paneldə hər xəbərin bir aydın aqibəti görünür.
 
-### 5.5.3 Dayandırılmış planın davranışı
+### 5.5.3 Dayandırma zamanı planların davranışı
 
-- Brokerdə qalan gözləyən əmrləri silinir.
-- Yeni gözləyən əmr yerləşdirilmir.
-- Açıq mövqe varsa, ticarət rejimi və quraşdırma kilidi halında **bağlanmır**, öz nüsxəsindəki qaydalarla idarə olunmağa davam edir (PLN-10). Zərər limiti halında isə bağlanır (RSK-07).
+Ticarət rejimi dayandırılanda, quraşdırma kilidi qoyulanda və ya zərər limiti kilidlənəndə:
+- icraya keçmiş planların brokerdə qalan gözləyən əmrləri silinir;
+- yeni gözləyən əmr yerləşdirilmir;
+- açıq mövqe ticarət rejimi və quraşdırma kilidi halında **bağlanmır**, öz nüsxəsindəki qaydalarla idarə olunmağa davam edir. Onun planı "İcra olunmuş"da qalır (PLN-10). Zərər limiti halında isə mövqe bağlanır (RSK-07).
 
 Əsas: artıq açılmış əməliyyat başladığı qaydalarla bitir. Zərər limiti yeganə istisnadır, çünki limitin məqsədi zərəri kəsməkdir.
 
@@ -648,7 +649,7 @@ Ask alıcının ödədiyi, daha yüksək qiymətdir: alış əmri onun üstünd�
 
 İki qat qoruma tətbiq olunur.
 
-**EMR-06. Birinci qat — sistem.** Expiration rejimi on olduqda, müddət planın xəbər anından sayılır. Həmin müddətdə heç bir əmr işə düşməzsə, sistem əmrləri silir və plan "Vaxtı bitmiş" olur. Faktiki bitmə anı **ən gec günün sonudur** (server vaxtı ilə 00:00). Rejim off olduqda birinci qat işləmir.
+**EMR-06. Birinci qat — sistem.** Expiration rejimi on olduqda, müddət planın xəbər anından sayılır. Həmin müddətdə heç bir əmr işə düşməzsə, sistem əmrləri silir və plan "Vaxtı bitmiş" olur. Faktiki bitmə anı **ən gec planın xəbər anının aid olduğu günün sonudur** (server vaxtı ilə növbəti 00:00). Rejim off olduqda birinci qat işləmir.
 Əsas: rejimin ayrıca açar olması sıfır dəyərinin "söndürülmüş", yoxsa "müddət sıfırdır" mənasında ikimənalı oxunmasının qarşısını alır. Gün sonu həddi plan üfüqündən gəlir: əmrin günü aşması plan məntiqində mənasızdır.
 
 **EMR-07. İkinci qat — broker.** Broker əmrə vaxt həddi qoymağı dəstəkləyirsə, bitmə vaxtı **həmişə** qoyulur:
@@ -656,7 +657,7 @@ Ask alıcının ödədiyi, daha yüksək qiymətdir: alış əmri onun üstünd�
 | Birinci qat | Broker səviyyəsində bitmə vaxtı |
 |---|---|
 | On | Silinmə müddətinin bitdiyi an |
-| Off | Həmin günün sonu, server vaxtı ilə 00:00 |
+| Off | Planın xəbər anının aid olduğu günün sonu (server vaxtı ilə növbəti 00:00) |
 
 Hər iki halda vaxt **növbəti tam dəqiqəyə yuxarı** yuvarlaqlaşdırılır.
 Əsas: sistem dayanarsa birinci qat işləməz, broker isə sistemdən asılı deyil. Bir çox broker yalnız dəqiqə dəqiqliyi qəbul edir. Yuxarı yuvarlaqlaşdırma əmrin vaxtından əvvəl silinməsinin qarşısını alır. Broker vaxt həddini dəstəkləmirsə, plan buraxılmır, sadəcə ikinci qat olmur.
@@ -741,7 +742,7 @@ Gözləyən əmrlərdən biri işə düşəndə digəri silinir. Bu, üç mexani
 | Brokerdə sistemin gözləyən əmri və ya mövqeyi var | 1 saniyə |
 | Yoxdur | 60 saniyə |
 
-Uzlaşdırmanın dörd işi var: əmrləri və mövqeləri plan identifikatoruna görə reyestrlə tutuşdurmaq; işə düşmüş planın qalmış əks əmrini silmək; planların vəziyyətini brokerin faktiki halına uyğunlaşdırmaq; yenidən başlamadan sonra bərpanı aparmaq (NSZ-08 ayrıca kod yazmır, uzlaşdırmanı çağırır).
+Uzlaşdırmanın dörd işi var: əmrləri və mövqeləri plan identifikatoruna görə reyestrlə tutuşdurmaq; işə düşmüş planın qalmış əks əmrini silmək; planların vəziyyətini brokerin faktiki halına uyğunlaşdırmaq; bağlantı bərpasından və yenidən başlamadan sonra bərpanı aparmaq (NSZ-08 və NSZ-11 ayrıca kod yazmır, uzlaşdırmanı çağırır).
 Əsas: platformanın hadisə növbəsi məhduddur və hadisə itə bilər. Yalnız hadisəyə güvənən sistem əks əmri brokerdə unuda bilər. Yoxlama lokaldır, şəbəkə sorğusu getmir, obyekt sayı kiçikdir. Platforma taymer hadisələrini yığmır, ona görə sıx takt növbəni şişirtmir.
 
 **İDR-10. Dondurma halında silmə təkrar edilir.** Dondurma keçicidir.
@@ -968,7 +969,7 @@ Qeydə alma ilə bildiriş eyni şey deyil. Qeydə alma limitsizdir, bildiriş i
 **NSZ-13. Hər EA 5 saniyədə bir nəbz qoyur** (qlobal dəyişəndə). **Ardıcıl üç nəbz buraxılarsa** (15 saniyə), digər EA onu susmuş sayır.
 Əsas: tək bir gecikmə saxta həyəcan verməməlidir. Nəbz bir rəqəmdir, şəbəkəyə çıxmır, xərci yoxdur.
 
-**NSZ-14. Ticarət EA susarsa, Rabitə EA təcili bildiriş göndərir.** Rabitə EA susarsa, Ticarət EA **bir** təcili bildiriş göndərir (ARX-04). Bu, yalnız heç bir plan hazırlıq pəncərəsində və ya yerləşdirmə anında olmayanda baş verir. Susan EA qayıdanda bərpa mesajını Rabitə EA göndərir.
+**NSZ-14. Ticarət EA susarsa, Rabitə EA təcili bildiriş göndərir.** Rabitə EA susarsa, Ticarət EA susma epizodu başına **bir** təcili bildiriş göndərir (ARX-04). Ticarət EA bu bildirişi yalnız heç bir plan hazırlıq pəncərəsində olmayanda və əmrlərin yerləşdirilməsi getmədiyi anda göndərir. Susan EA qayıdanda bərpa mesajını Rabitə EA göndərir.
 Əsas: SendNotification-ın müddəti rəsmi sənəddə yazılmayıb. Bu şərtlərlə o, heç vaxt əmrləri gecikdirmir. Müddət Mərhələ 1-də ölçülür.
 
 **NSZ-15. İki EA birdən susarsa, proaktiv aşkarlama yoxdur.** Operator bunu iki yolla bilir: paneldə vəziyyətin vaxt möhrü köhnəlir və gündəlik xülasə gəlmir. Bu, şüurlu qərardır: xarici izləyici xidmət yeni asılılıq olardı. **Sistem tamamilə dayanıbsa, operator bunu ən geci növbəti gündəlik xülasənin gəlmədiyi anda biləcək.**
@@ -996,7 +997,10 @@ Qeydə alma ilə bildiriş eyni şey deyil. Qeydə alma limitsizdir, bildiriş i
 **EAL-04. Planın sahibliyi atomik keçir:**
 - "Qurulmuş" vəziyyətdə planın sahibi **Rabitə EA**-dır: qurur, yeniləyir, ləğv edir.
 - "Hazırlıqda" və sonrakı vəziyyətlərdə sahibi **Ticarət EA**-dır.
-- Keçidlər yalnız `GlobalVariableSetOnCondition` ilə aparılır: Ticarət EA "Qurulmuş → Hazırlıqda", Rabitə EA "Qurulmuş → Ləğv edilmiş". **Birinci gələn qalib gəlir,** digərinin cəhdi rədd edilir.
+- "Qurulmuş" vəziyyətdən çıxan hər keçid yalnız `GlobalVariableSetOnCondition` ilə aparılır:
+  - Rabitə EA: "Qurulmuş → Ləğv edilmiş";
+  - Ticarət EA: "Qurulmuş → Hazırlıqda", "Qurulmuş → Dayandırılmış" (zərər limiti kilidi, RSK-06), "Qurulmuş → Buraxılmış" (yenidən başlamadan sonra pəncərə sığmır, HZR-06).
+- **Birinci gələn qalib gəlir,** digərinin cəhdi rədd edilir.
 Əsas: plan eyni anda həm ləğv edilə, həm icraya keçə bilməz. Rəsmi sənədə görə bu funksiya "atomic access … for providing of a mutex at interaction of several Expert Advisors" verir.
 
 **EAL-05. Plan siyahısının ötürülməsi:** Rabitə EA yeni siyahını fayla yazır (LOK-02), sonra qlobal dəyişəndəki növbə nömrəsini artırır. Ticarət EA öz taktında nömrənin dəyişdiyini görüb faylı oxuyur. Köhnə nömrəli siyahı yenisini əvəz edə bilmir. EA-lar arasında qrafik hadisəsi işlədilmir.
@@ -1121,7 +1125,7 @@ API-də panel üçün **heç bir ticarət hərəkəti** və heç bir silmə sor�
 - **A-2.** Arxivləmə API-də adi bir sorğudur və platformanın cədvəlləyicisi onu çağırır. Platforma dəyişsə, yalnız cədvəl yenidən qurulur.
 - **A-3.** Keçən həftənin canlı topluları bir sıxılmış arxiv faylına yığılır. Arxiv yazılır, **geri oxunur**, qeyd sayı və yoxlama cəmi canlı toplularla tutuşdurulur.
 - **A-4.** Həmin həftənin arxivi artıq varsa, iş təkrarlanmır. Uğursuz həftə növbəti çağırışda tamamlanır.
-- **A-5.** Canlı toplu **iki şərt birlikdə ödənəndə** silinir: onun həftəsinin arxivi yoxlanıb **və** canlı qoruma müddəti (30 gün) keçib. API bunu hər həftə yoxlayır. Canlı bucket-da təxminən son 5 həftənin topluları olur.
+- **A-5.** Canlı toplu **iki şərt birlikdə ödənəndə** silinir: onun həftəsinin arxivi yoxlanıb **və** canlı qoruma müddəti (30 gün) keçib. API bunu hər həftə yoxlayır və adi silmə göndərir (ANB-03a). Canlı bucket-da təxminən son 5 həftənin topluları olur.
 - **A-6.** Uyğunsuzluq varsa, heç nə silinmir və hal qeydə alınır.
 
 Əsas: toplular 10 saniyədə bir yazılır, yəni ayda 259 000-ə qədər obyekt yaranır. Siyahılama AWS-də yazma tarifi ilə ödənilir. Arxiv hər həftəni bir obyektə yığır. Canlı qoruma kodda səhv olsa belə 30 gün ərzində heç bir qeydin itməməsini fiziki olaraq təmin edir.
@@ -1135,14 +1139,19 @@ API-də panel üçün **heç bir ticarət hərəkəti** və heç bir silmə sor�
 | `config` | Konfiqurasiya | Standard | Yox | Yox | Redaktədə üzərinə yazılır |
 | `state` | Vəziyyət (simvol xüsusiyyətləri daxil) | Standard | **Yox** | Yox | 10 saniyədə bir üzərinə yazılır |
 | `snapshots` | Parametr nüsxələri | Standard | Yox | Yox | Yazılır, silinir |
-| `evidence-live` | 10 saniyəlik qeyd topluları | Standard | Bəli | **30 gün** | Hər toplu yeni obyektdir |
-| `evidence-archive` | Həftəlik arxivlər | **Glacier Instant Retrieval** (R2-də Standard-IA) | Bəli | **Governance, müddətsiz** | Həftədə bir yeni obyekt |
+| `evidence-live` | 10 saniyəlik qeyd topluları | Standard | AWS-də bəli* | **30 gün** | Hər toplu yeni obyektdir |
+| `evidence-archive` | Həftəlik arxivlər | **Glacier Instant Retrieval** (R2-də Standard-IA) | AWS-də bəli* | **Governance, müddətsiz** | Həftədə bir yeni obyekt |
+
+\* AWS-də Object Lock yalnız versiyalı bucketda işləyir. R2-də qoruma bucket lock ilə verilir və versiya tələb etmir. R2-də versiyanın olub-olmaması uyğunluq testində yoxlanılır (PRT-06).
 
 **ANB-02. Hər sahə ayrıca bucket-dır, prefiks deyil.**
 Əsas: R2 tokenləri yalnız bucket üzrə daralır. AWS-də qoruma müddəti bucket-dakı "every object version placed in the bucket" üçündür, obyekt üzrə fərqli müddət isə R2-nin dəstəkləmədiyi başlıqlarla verilir. Canlı və arxiv qeydlərinin fərqli qorumaya ehtiyacı var, ona görə ayrı bucketlardadır.
 
 **ANB-03. Versiya və qoruma yalnız iki qeyd bucket-ında açılır.**
-Əsas: AWS Object Lock yalnız versiyalı bucketda işləyir. `state` bucket-ında versiya açılsaydı, ayda iki yüz mindən çox versiya yığılardı. Qoruma üzərinə yazmanı da bloklayır, `state`-ə və `config`-ə tətbiq olunsaydı sistem ilk taktda dayanardı.
+Əsas: AWS Object Lock yalnız versiyalı bucketda işləyir. `state` bucket-ında versiya açılsaydı, ayda iki yüz mindən çox versiya yığılardı. Qoruma `state`-ə və `config`-ə tətbiq olunsaydı: R2-də üzərinə yazma bloklanar və sistem ilk taktda dayanardı, AWS-də isə hər yazma silinə bilməyən yeni versiya yaradardı.
+
+**ANB-03a. Kod həmişə adi `DeleteObject` göndərir, versiya nömrəsi ilə silmir.** AWS-in versiyalı bucketında adi silmə obyekti silmir, yalnız "delete marker" qoyur. Köhnə versiyanı qoruma müddəti bitəndən sonra **quraşdırmada qurulan lifecycle qaydası** (`NoncurrentVersionExpiration`) qalıcı silir. R2-də adi silmə qoruma müddətindən sonra obyekti birbaşa silir.
+Əsas: portativlik (PRT-02, dörd əməliyyat). API-nin açarına versiya silmə icazəsi lazım olmur (ANB-07), qalıcı silməni yalnız anbarın öz qaydası edir.
 
 **ANB-04. Arxivin qoruması Governance rejimindədir, müddətsiz.** Adi açarlar silə bilmir, xüsusi icazəli admin isə səhvi düzəldə bilər.
 Əsas: qeydlər brokerə qarşı hüquqi dəlil deyil (ANB-10), ona görə Compliance-in geri dönülməzliyinə ehtiyac yoxdur. Rəsmi sənədə görə Compliance-də obyekti müddətdən əvvəl silməyin yeganə yolu AWS hesabını silməkdir.
@@ -1159,10 +1168,10 @@ API-də panel üçün **heç bir ticarət hərəkəti** və heç bir silmə sor�
 | Bucket | İcazə |
 |---|---|
 | `config`, `state`, `snapshots` | Oxu, yaz, siyahıla. `snapshots` üçün həm də sil |
-| `evidence-live` | Oxu, yaz, siyahıla, sil (qoruma müddəti bitənə qədər silmə fiziki olaraq bloklanır) |
+| `evidence-live` | Oxu, yaz, siyahıla, adi silmə (qoruma müddəti bitənə qədər məzmun itə bilmir) |
 | `evidence-archive` | Oxu, yaz, siyahıla. **Silmə yoxdur** |
 
-Açarın bucket yaratmaq, qoruma və ya versiya dəyişmək icazəsi yoxdur.
+Açarın bucket yaratmaq, qoruma, versiya və ya lifecycle dəyişmək, versiya nömrəsi ilə silmək icazəsi yoxdur.
 Əsas: API sındırılsa belə, açarla arxiv silinə və qoruma söndürülə bilməz. EA və panelin icazə fərqləri API-nin öz marşrutlarında tətbiq olunur (API-02, API-03).
 
 **ANB-08. Panel üçün qeydlər bir cavabda verilir:** cari və keçən həftə canlı bucket-dan, köhnə həftələr arxivdən. İstifadəçi fərqi görmür.
@@ -1355,12 +1364,13 @@ Həftəsonu xülasəsi qısadır: "Bazar bağlı idi. Sistem işləyir."
 
 **PRT-04. Kod bucket yaratmır, qoruma, versiya və ya lifecycle qurmur.** Bunlar quraşdırmadır.
 
-**PRT-05. Hər provayder üçün yazılı quraşdırma təlimatı olur** (AWS və R2): bucketlar, açar və icazələr, qoruma, versiya, Access tətbiqi, cədvəlləyici, məlumatın köçürülməsi addımı.
+**PRT-05. Hər provayder üçün yazılı quraşdırma təlimatı olur** (AWS və R2): bucketlar, açar və icazələr, qoruma, versiya, lifecycle (AWS-də `evidence-live` üçün köhnə versiyaların silinməsi, ANB-03a), Access tətbiqi, cədvəlləyici, məlumatın köçürülməsi addımı.
 
 **PRT-06. Uyğunluq testi.** Provayder qəbul edilməzdən əvvəl real provayderdə işə salınır və bunları yoxlayır:
 - dörd əməliyyat işləyir;
 - qadağan olunmalı olan hər şey həqiqətən qadağandır (məsələn, arxivdən silmə);
-- canlı və arxiv bucketlarında qoruma silməni və üzərinə yazmanı bloklayır;
+- canlı və arxiv bucketlarında qoruma müddəti ərzində silmə və ya üzərinə yazma **əvvəlki məzmunu itirə bilmir**;
+- canlı bucket-da qoruma müddəti bitmiş toplu adi silmə ilə yox olur (AWS-də lifecycle ilə, ANB-03a);
 - `state` və `config` bucketlarında üzərinə yazma **işləyir** və versiya yaranmır;
 - saxlama sinfi düzgündür.
 
@@ -1377,7 +1387,7 @@ Cari seçim: API və panel Cloudflare Workers-də, giriş Cloudflare Access-də,
 **Anbar provayderi — məcburi:**
 1. S3 API, SigV4 imzası və `Content-MD5` dəstəyi (PRT-02).
 2. Bucket üzrə icazə verilə bilən açar (ANB-02, ANB-07).
-3. Bucket üzrə açılan versiya və silməyə/üzərinə yazmaya qarşı qoruma, həm müddətli (30 gün), həm də müddətsiz (ANB-01, ANB-04). Qoruma **yalnız seçilmiş bucketlara** tətbiq oluna bilməlidir.
+3. Bucket üzrə silməyə və üzərinə yazmaya qarşı qoruma (versiya ilə və ya versiyasız), həm müddətli (30 gün), həm də müddətsiz (ANB-01, ANB-04). Qoruma **yalnız seçilmiş bucketlara** tətbiq oluna bilməlidir. Versiya tələb olunursa, köhnə versiyaları qoruma müddətindən sonra silən lifecycle qaydası olmalıdır (ANB-03a).
 4. Obyektin tez silinməsinə və ya üzərinə yazılmasına görə minimum saxlama haqqı olmamalıdır, heç olmasa Standard sinifdə. Sistem vəziyyəti 10 saniyədə bir üzərinə yazır, nüsxələri isə silir. Wasabi bu səbəbdən yaramır (90 günlük minimum).
 5. Ödəniş operatorun ölkəsindən mümkün olmalıdır.
 
@@ -1412,7 +1422,7 @@ Cari seçim: API və panel Cloudflare Workers-də, giriş Cloudflare Access-də,
 | Müvəqqəti rəddə təkrar | Ən çoxu 3, xəbər anına qədər. Lead Time = 0 olduqda 0 | EMR-11 |
 | Nəticəsi naməlum əmrin təkrarı | Soruşduqdan sonra 1 | EMR-11 |
 | Broker bitmə vaxtının yuvarlaqlaşdırılması | Növbəti tam dəqiqəyə, yuxarı | EMR-07 |
-| Gözləyən əmrin ən gec bitməsi | Günün sonu, 00:00 | EMR-06 |
+| Gözləyən əmrin ən gec bitməsi | Planın xəbər anının aid olduğu günün sonu (növbəti 00:00) | EMR-06 |
 | Uzlaşdırma aralığı | Brokerdə iş varsa 1 s, yoxdursa 60 s | İDR-09 |
 | Silinməyən əks əmr üçün təcili bildiriş | Əmr işə düşəndən 10 s sonra | İDR-11 |
 | Nəbz aralığı / susma həddi | 5 s / 3 buraxılmış nəbz (15 s) | NSZ-13 |
@@ -1439,7 +1449,7 @@ Cari seçim: API və panel Cloudflare Workers-də, giriş Cloudflare Access-də,
 |---|---|---|
 | Preparation Window (qlobal) | 1–300 s | 10 s |
 | Lead Time | 0–300 s (0 = xəbər anı) | yoxdur |
-| Expiration müddəti (rejim on) | 1–86 400 s. Faktiki bitmə ən gec 00:00 | yoxdur |
+| Expiration müddəti (rejim on) | 1–86 400 s. Faktiki bitmə ən gec planın gününün sonu (növbəti 00:00) | yoxdur |
 | Offset, Stop Loss, Max Spread, BE Trigger/Lock, TS Trigger/Distance | > 0, sabit yuxarı hədd yoxdur | yoxdur |
 | Take Profit | ≥ 0 | yoxdur |
 | Fixed Lot | > 0. Broker hədləri hazırlıqda yoxlanılır | yoxdur |
@@ -1633,7 +1643,7 @@ Bu sənəd qaralamadan fərqlənən hər qərarı müsahibə jurnalına (`.claud
 | ARX-09…ARX-12, 3.4, 3.5, API-01…API-05, THL | Q21, Q14 |
 | ARX-06, 3.2 | Q15 |
 | ARX-04, NSZ-14 | Q05 |
-| ANB bölməsi, API-09, QYD-05 | Q10, Q22 |
+| ANB bölməsi, API-09, QYD-05 | Q10, Q22 (ANB-03a: sənəd yoxlaması, 2026-09-25) |
 | EAL-08…EAL-11 | Q23 |
 | EAL-01…EAL-07, PLN-09, PLN-13, PLN-14 | Q17 |
 | LOK bölməsi | Q03, Q04, Q18, Q19 |

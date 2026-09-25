@@ -48,6 +48,8 @@ Rəsmi mənbələrdən yoxlanmış faktlar (yoxlama tarixi: 2026-09-23).
 - Qiymət (https://aws.amazon.com/s3/pricing/): sorğular hər 1 000 üçün hesablanır; "LIST requests … are charged at the same rate as S3 Standard PUT"; "DELETE and CANCEL requests are free". Yeni müştərilərə 200 dollara qədər Free Tier krediti verilir. Konkret tariflər səhifədən çıxarıla bilmədi, AWS Pricing Calculator ilə hesablanmalıdır.
 - S3 Glacier Instant Retrieval (`GLACIER_IR`): millisaniyəlik, "real-time access". Standard-IA ilə müqayisədə saxlama ucuzdur, "higher data access costs". "minimum object size of 128 KB", "minimum storage duration period of 90 days". — https://docs.aws.amazon.com/AmazonS3/latest/userguide/glacier-storage-classes.html
 - R2-də yalnız STANDARD və STANDARD_IA saxlama sinifləri var (bax: R2 uyğunluq cədvəli).
+- Versiyalı bucketda "a simple DELETE does not actually remove the specified object. Instead, Amazon S3 inserts a delete marker". Qalıcı silmə üçün `DELETE Object versionId` və ya lifecycle-ın `NoncurrentVersionExpiration` qaydası lazımdır: "Amazon S3 permanently removes these object versions". — https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html
+- R2-nin S3 uyğunluq səhifəsində versiya (Versioning) əməliyyatları çəkilmir (2026-09-25). R2-də versiyanın olub-olmaması uyğunluq testində (T-4) yoxlanılacaq. Bucket lock sənədində versiya tələbi göstərilməyib.
 ### Wasabi
 - Minimum saxlama müddəti 90 gündür (Pay as You Go). Obyekt ondan tez silinsə, qalan günlər üçün "Timed Deleted Storage" haqqı tutulur. — https://wasabi.com/pricing/faq
 
