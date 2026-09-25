@@ -50,6 +50,7 @@ Rəsmi mənbələrdən yoxlanmış faktlar (yoxlama tarixi: 2026-09-23).
 - R2-də yalnız STANDARD və STANDARD_IA saxlama sinifləri var (bax: R2 uyğunluq cədvəli).
 - Versiyalı bucketda "a simple DELETE does not actually remove the specified object. Instead, Amazon S3 inserts a delete marker". Qalıcı silmə üçün `DELETE Object versionId` və ya lifecycle-ın `NoncurrentVersionExpiration` qaydası lazımdır: "Amazon S3 permanently removes these object versions". — https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html
 - R2-nin S3 uyğunluq səhifəsində versiya (Versioning) əməliyyatları çəkilmir (2026-09-25). R2-də versiyanın olub-olmaması uyğunluq testində (T-4) yoxlanılacaq. Bucket lock sənədində versiya tələbi göstərilməyib.
+- Presigned URL: "presigned URLs are bearer tokens that grant access to those who possess them". Müddət bitənə qədər dəfələrlə işlədilə bilir. IAM istifadəçi açarı ilə SigV4 imzalı URL ən çoxu 7 gün etibarlıdır. Mövcud obyektin üzərinə yazır. — https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html
 ### Wasabi
 - Minimum saxlama müddəti 90 gündür (Pay as You Go). Obyekt ondan tez silinsə, qalan günlər üçün "Timed Deleted Storage" haqqı tutulur. — https://wasabi.com/pricing/faq
 

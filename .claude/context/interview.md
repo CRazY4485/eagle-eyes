@@ -48,6 +48,7 @@ Mənbə: qaralama `layihe-senedi.md` (1699 sətir, 21 bölmə).
 **Düzəldilmiş K-1 təklif edildi:** anbar həqiqətdir; hər 30 saniyəlik oxunuşda yoxlanmış konfiqurasiya lokala yazılır — yalnız məzmun fərqlidirsə, lokal yoxdursa və ya zədəlidirsə; anbar əlçatandırsa lokal oxunmur; lokal anbara geri yazılmır.
 **Cavab 2:** "Bəli, haması uyğundur" (seçim: düzəldilmiş K-1 + L-1…L-4 + fayl ömürləri + K-2…K-4 + növbəyə hədd yoxdur)
 **Recorded:** 2026-09-23
+**Qismən əvəzlənib (Q17/S-5, 2026-09-25):** fayl ömürləri cədvəlində parametr nüsxəsinin lokal faylını "Rabitə EA" yox, **Ticarət EA** yazır; Rabitə EA onu API-yə yükləyir. Q21-dən sonra "anbar" → "API vasitəsilə anbar". Qalan qaydalar qüvvədədir.
 
 ## Q05 [answered] Rabitə EA susarsa, təcili bildirişi Ticarət EA özü göndərirmi?
 **Asked:** 11.5 deyir susmuş EA-nı digəri aşkarlayıb təcili bildiriş göndərir; amma push yalnız Rabitə EA-dadır (3.1). Ticarət EA push göndərə bilərmi? (Rəsmi sənədlər: WebRequest sinxrondur; SendNotification-ın bloklaması və həddin əhatəsi yazılmayıb — project.md)
@@ -107,6 +108,7 @@ Mənbə: qaralama `layihe-senedi.md` (1699 sətir, 21 bölmə).
 **Answer 3 (canlı qoruma):** "30 gün"
 **Recorded:** 2026-09-25
 **Nəticə:** quruluş və A-1…A-6 qəbul; arxiv Governance müddətsiz; evidence-live qoruması 30 gün. Rabitə EA-nın məhdudiyyətləri sualı cavablandırılmalıdır.
+**Texniki düzəliş (sənəd review-u, 2026-09-25, rəsmi sənədlə):** AWS-in versiyalı bucketında adi DELETE obyekti silmir, "delete marker" qoyur; qalıcı silmə quraşdırmadakı `NoncurrentVersionExpiration` lifecycle qaydası ilə olur. Kod həmişə adi DeleteObject göndərir (spec ANB-03a). Versiya yalnız AWS-də lazımdır (Object Lock tələbi); R2-də qoruma bucket lock ilə, versiyasız — R2-də versiyanın olub-olmaması T-4-də yoxlanılır. Bu, qərar dəyişikliyi deyil, A-5-in necə işləyəcəyinin düzəlişidir.
 
 ## Q23 [answered] Rabitə EA-nın MQL5 sərhədləri
 **Asked:** Rabitə EA üçün R-EA-1 (vəziyyət + qeyd toplusu bir sorğuda, API ayırır), R-EA-2 (taktda ən çoxu bir şəbəkə sorğusu), R-EA-3 (timeout ≤ 5 s, nəbz sorğudan əvvəl və sonra), öz JSON oxuyucusu (MQL5-də JSON yoxdur), Mərhələ 1-də VPS→API sorğu müddətinin ölçülməsi qəbul olunurmu?
@@ -143,6 +145,7 @@ Mənbə: qaralama `layihe-senedi.md` (1699 sətir, 21 bölmə).
 **İzah verildi:** mümkündür; Object Lock versiyalama tələb edir (yalnız qeydlər bucket-ında); IAM ən mürəkkəb quraşdırmadır; tariflər dəqiq çıxarılmadı; bir ehtiyat tövsiyəsi (B2).
 **Answer (Q10):** "AWS əsas, R2 ehtiyat. Lakin digər məsələləri dəqiqləşdirmək lazımdır. Məsələn, dəlil qeydləri həftədə 1 dəfə arxivlənir və hamısını ayrıca qovluqda 1 bucket içərisində saxlamaq, bu arxivlərə baxış üçün `S3 Glacier İnstant Retrieval` depolama sinifi seçimi və s." (2026-09-25)
 **Nəticə:** Q10 answered — AWS əsas, R2 ehtiyat. Yeni tələb: dəlil qeydlərinin həftəlik arxivi → Q22. Qaralamanın 13.4 "heç vaxt … arxivləşdirmir" qaydası ilə toqquşur.
+**Əvəzlənənlər:** (a) Q10-da təqdim olunan P-5 (dörd tək səviyyəli açar) birbaşa anbar yolu üçün idi və heç vaxt təsdiqlənməyib; Q21 (B) ilə əvəzlənib, yekun Q27: API-də bir, bucket üzrə məhdud açar (spec ANB-07). P-1…P-4, P-6, P-7 API qatının içində qüvvədədir. (b) Q21-in B təklifindəki "R2 əsas, B2 ehtiyat" bu cavabla əvəzlənib: AWS əsas, R2 ehtiyat.
 **Qeyd:** quruluş hələ təsdiqlənməyib; öz Linux VPS-də hostinq variantı qiymətləndirilməlidir. Qaralamanın 1.3 ("heç bir gündəlik əməliyyat server bilikləri tələb etmir") və 3.5 ("server deyil, virtual maşın deyil") prinsipləri ilə toqquşma göstərilməlidir.
 **Ripple:** qaralamanın 3.1, 3.3, 3.5, 3.6, 12.3, 16.1, 17, 18 yenidən yazılır. P-1…P-7 API qatının içinə keçir. Əvvəlki qərarlarda "anbar" → "API vasitəsilə anbar" (Q03/Q18 nüsxələr, Q04/Q19 konfiqurasiya, Q08 S-2 simvol xüsusiyyətləri, Q-6 EA siyahılaması → API sorğusu). EA parametrləri: API ünvanı + token. Q10 ikiyə bölünür: API platforması + anbar provayderi; panel girişi (2FA) üsulu seçilməlidir.
 
@@ -178,6 +181,7 @@ Mənbə: qaralama `layihe-senedi.md` (1699 sətir, 21 bölmə).
 
 ## Q15 [answered] Panelin ünvanı EA-nın icazə siyahısına aiddirmi?
 **Həll (fakt, 2026-09-24):** EA panelə müraciət etmir. İcazəli siyahıda yalnız EA-nın müraciət etdiyi ünvanlar olur: API qatının domeni (Q21) və Forex Factory. Panelin hostinqinin dəyişməsi VPS-ə təsir etmir. İzahda istifadəçiyə deyildi, etiraz olmadı. Yekun xülasədə təsdiqlənəcək.
+**Təsdiq (Q25-C, 2026-09-25):** "Bəli, ikisi də düzgündür"
 **Asked:** 15.3 panelin ünvanı dəyişsə sinxronizasiya lazımdır deyir, amma EA panelə müraciət etmir. (Mənim düzəliş təklifim: yalnız anbar və xəbər mənbəyinin ünvanları.)
 
 ## Q16 [answered] Həftəsonu gündəlik xülasə göndərilsinmi?
@@ -201,6 +205,8 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Təklif 3:** Ə-2 yenilənmiş — qrafik hadisəsi yoxdur, Ticarət EA növbə nömrəsini öz taktında yoxlayır; Ə-1, Ə-3, Ə-4, S-1, S-2, S-4, S-5 dəyişməz.
 **Cavab 3:** "Hadisə əsaslı saxlanıldığı təqdirdə müsbət fayda əldə edilirsə əgər isimləndirməni aydınlaşdıraraq istifadə edə bilərsən." (2026-09-25)
 **Qərar (istifadəçinin şərtinə görə mənim qiymətləndirməm):** müsbət fayda yoxdur — siyahılar dəqiqələrlə əvvəl hazırlanır; ən təcili dəyişiklik (ticarət rejiminin dayandırılması) onsuz da API-dən 30 s-ə qədər gecikmə ilə gəlir, qrafik hadisəsinin qənaət etdiyi ≤1 takt bunun yanında əhəmiyyətsizdir. Qrafik hadisəsi işlədilmir. Qalan qaydalara etiraz edilməyib → Q17 answered (yekun xülasədə təsdiqlənəcək).
+**Təsdiq (Q25-C, 2026-09-25):** "Bəli, ikisi də düzgündür"
+**Sonrakı düzəliş (sənəd review-u, 2026-09-25):** "Qurulmuş"dan çıxan hər keçid atomikdir; Ticarət EA həm də "Qurulmuş → Dayandırılmış" (zərər limiti) və "Qurulmuş → Buraxılmış" (HZR-06) keçidlərinin sahibidir (spec EAL-04). Q25/B1-dən çıxan nəticədir, yeni qərar deyil.
 **Asked:** Planı Rabitə EA qurur, vəziyyətini Ticarət EA dəyişir. Həqiqət mənbəyi kimdir? (Dizayn qərarı — təklifimi dizayn mərhələsində verəcəm.)
 
 ## Q24 [answered] Sənədin forması və yazılma vaxtı
@@ -209,6 +215,27 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Answer (2):** "Layihə qovluğunda Markdown (Tövsiyə)"
 **Recorded:** 2026-09-25
 **Nəticə:** sənəd `docs/superpowers/specs/` altında Markdown, git ilə. Yazmazdan əvvəl qaralama + qərarlar sistemli yoxlanılır; Q15/Q17 təsdiqi hələ açıqdır (Q25-də).
+
+## Q29 [deferred: Mərhələ 1 (MRH-01) — VPS sınaq proqramının nəticəsi] MT5 təqvimi VPS-də əlçatandırmı, Forex Factory VPS-in ünvanından çəkilə bilirmi?
+**Mənbə:** qaralama 20.1; spec MRH-01, 21.1. Cavab "xeyr" olarsa təqvim dizaynı dəyişir.
+
+## Q30 [deferred: Mərhələ 1 (MRH-01)] Forex Factory yeni həftəyə hansı anda keçir və "vaxtı təsdiqlənməmiş" xəbəri göstərən sahə varmı?
+**Mənbə:** Q25/B10; spec TQV-01, TQV-09, MRH-01. Nəticəyə görə 6.1 və 6.5 dəqiqləşir.
+
+## Q31 [deferred: Mərhələ 1 (MRH-01) — netting demo hesabda] Netting hesabda mövqe plana hansı əlamətlə bağlanır?
+**Mənbə:** Q26/N-6; spec PLN-16. Netting demo hesab ayrıca açılmalıdır.
+
+## Q32 [deferred: Mərhələ 1 (MRH-01)] SendNotification-ın və VPS→API sorğusunun real müddəti nədir?
+**Mənbə:** Q05, Q23; spec NSZ-14, EAL-10. Nəticə ≤ 5 s gözləmə həddinin və nəbz ehtiyatının kifayət olub-olmadığını göstərir.
+
+## Q33 [deferred: Mərhələ 1 (MRH-01), qış vaxtına keçid] CFI serverinin qış/yay vaxtı qaydası nədir?
+**Mənbə:** Q11 (2026-09-25-də UTC+3); spec TQV-20.
+
+## Q28 [answered] Presigned URL layihəyə fayda verərmi?
+**Asked (istifadəçi, 2026-09-25):** "Bəzi araşdırmalarımda Presigned URL qavramını gördüm layihəyə müsbət təsiri olar mı? İləri mərhələlərdə üzərində danışılacaq məsələdir yoxsa indi də danışabilərik mi, açıqcası bilmirəm."
+**İzah:** fayda yoxdur (məlumat kiçikdir); pisləşdirər: EA sorğuları ikiqat (EAL-09), anbar ünvanı VPS siyahısına düşər (ARX-06), portativlik (PRT-01), CORS geri qayıdar (ARX-11), bearer sızma riski. Yenidən baxma şərti: böyük fayl ehtiyacı, yalnız panel üçün.
+**Answer:** "İşlədilmir, sənədə yazma" (2026-09-25)
+**Qərar:** presigned URL işlədilmir. Sənədə yazılmır, qərar yalnız bu jurnalda qalır.
 
 ## Q27 [answered] Sənəddə açıq təsdiq tələb edən dörd nəticə (review-dan sonra)
 **Asked (2026-09-25):** 1 TQV-10 Paused-da planlar qurulur; 2 NSZ-09 API əlçatmazlığı təcili bildiriş; 3 ANB-07 API-nin bir minimum icazəli anbar açarı; 4 17.2 provayder meyarları saxlanılır.
