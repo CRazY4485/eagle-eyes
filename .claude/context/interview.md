@@ -216,6 +216,14 @@ Q-1 yazma iki yerə (anbar növbə ilə); Q-2 bərpa: anbar → lokal → ikisi 
 **Recorded:** 2026-09-25
 **Nəticə:** sənəd `docs/superpowers/specs/` altında Markdown, git ilə. Yazmazdan əvvəl qaralama + qərarlar sistemli yoxlanılır; Q15/Q17 təsdiqi hələ açıqdır (Q25-də).
 
+## Q34 [open] API varsa, panel ilə anbarın fərqli provayderlərdə olmasına təhlükəsizlik baxımından hələ ehtiyac varmı?
+**Asked (istifadəçi, 2026-09-25):** "Əgər API istifadə ediriksə, panel ilə bazanın təhlükəsizlik baxımından fərqli provayderlərdə saxlanmasına hələ də ehtiyac varmı."
+**İzah verildi:** ayrılıq API-dən sonra yalnız dəlil qeydlərini/arxivi bir hesabın ələ keçirilməsindən qoruyur. Seçimlər: 1 ayrılıq qalsın (tövsiyə) / 2 hamısı Cloudflare-da.
+**Cavab 1:** "Təhlükəsizlik dedikdə, dəlil qeydlərinin ələ keçirilməsi aspektindən baxmaq lazım deyil. Əsas təhlükə ticarət hesabında rast gələ şəkildə (random) ticarətlərin açılması və maddi zərər verilməsidir" (2026-09-25)
+**Mənim oxunuşum:** təhlükə modeli = hesabda icazəsiz/təsadüfi ticarətlə maddi zərər. Q10-dakı AWS seçiminin təhlükəsizlik əsası bu modeldə keçərli deyil → reconciliation; əsas qorunmalı olan konfiqurasiyanın (ticarət parametrlərinin) saxtalaşdırılmasıdır.
+**Təklif (2026-09-25):** T-1 EA parametrlərində təhlükəsizlik tavanları (ən böyük lot, ən böyük Risk %, məcburi zərər limitləri, icazəli simvollar; aşan konfiqurasiya rədd + təcili bildiriş; PNL-11 dəyişir); T-2 hər konfiqurasiya dəyişikliyində təcili bildiriş; anbar: A hamısı Cloudflare (R2) — tövsiyə / B AWS əsas qalır.
+**Cavab 2:** üç sualın üçünə də "[No preference]" (2026-09-25) — qərar verilməyib, açıq qalır.
+
 ## Q29 [deferred: Mərhələ 1 (MRH-01) — VPS sınaq proqramının nəticəsi] MT5 təqvimi VPS-də əlçatandırmı, Forex Factory VPS-in ünvanından çəkilə bilirmi?
 **Mənbə:** qaralama 20.1; spec MRH-01, 21.1. Cavab "xeyr" olarsa təqvim dizaynı dəyişir.
 
